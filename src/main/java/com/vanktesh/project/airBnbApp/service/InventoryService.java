@@ -1,11 +1,15 @@
 package com.vanktesh.project.airBnbApp.service;
 
+import com.vanktesh.project.airBnbApp.dto.HotelDto;
+import com.vanktesh.project.airBnbApp.dto.HotelSearchRequest;
 import com.vanktesh.project.airBnbApp.entity.Room;
+import org.springframework.data.domain.Page;
 
 public interface InventoryService {
 
     void initializeRoomFOrAYear(Room room);
 
-    void deleteFutureInventories(Room room);
+    void deleteAllInventories(Room room);
 
+    Page<HotelDto> searchHotels(HotelSearchRequest hotelSearchRequest);
 }

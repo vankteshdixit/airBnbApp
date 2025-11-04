@@ -5,6 +5,7 @@ import com.vanktesh.project.airBnbApp.entity.Hotel;
 import com.vanktesh.project.airBnbApp.entity.Room;
 import com.vanktesh.project.airBnbApp.exception.ResourceNotFoundException;
 import com.vanktesh.project.airBnbApp.repository.HotelRepository;
+import com.vanktesh.project.airBnbApp.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -19,6 +20,7 @@ public class HotelServiceImpl implements HotelService {
     private final HotelRepository hotelRepository;
     private final ModelMapper modelMapper;
     private final InventoryService inventoryService;
+    private final RoomRepository roomRepository;
 
     @Override
     public HotelDto createNewHotel(HotelDto hotelDto){
@@ -58,10 +60,13 @@ public class HotelServiceImpl implements HotelService {
                 .findById(id)
                 .orElseThrow(()-> new ResourceNotFoundException("Hotel not found with ID: "+id));
 
-        hotelRepository.deleteById(id);
+//        hotelRepository.deleteById(id);
         for (Room room : hotel.getRooms()){
-            inventoryService.deleteFutureInventories(room);
+            inventoryService.deleteAllInventories(room);
+            roomRepository.deleteById(room.getId());
         }
+//        problem in past-> that i am deleting the hotel first then room
+        hotelRepository.deleteById(id);
     }
 
     @Override

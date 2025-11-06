@@ -24,7 +24,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
             WHERE i.city = :city
                 AND i.date BETWEEN :startDate AND :endDate
                 AND i.closed = false
-                AND (i.totalCount - i.bookedCount) >= :roomsCount
+                AND (i.totalCount - i.bookedCount - i.reservedCount) >= :roomsCount
             GROUP BY i.hotel, i.room
             HAVING COUNT(i.date) = :dateCount
             """)
@@ -44,7 +44,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
             WHERE i.room.id = :roomId
                 AND i.date BETWEEN :startDate AND :endDate
                 AND i.closed = false
-                AND (i.totalCount - i.bookedCount) >= :roomsCount
+                AND (i.totalCount - i.bookedCount- i.reservedCount) >= :roomsCount
             """)
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Inventory> findAndLockAvailableInventory(

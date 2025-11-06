@@ -2,13 +2,13 @@ package com.vanktesh.project.airBnbApp.controller;
 
 import com.vanktesh.project.airBnbApp.dto.BookingDto;
 import com.vanktesh.project.airBnbApp.dto.BookingRequest;
+import com.vanktesh.project.airBnbApp.dto.GuestsDto;
 import com.vanktesh.project.airBnbApp.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,4 +22,10 @@ public class HotelBookingController {
         return ResponseEntity.ok(bookingService.initialiseBooking(bookingRequest));
     }
 
+    @PostMapping("/{bookingId}/addGuests")
+
+    public ResponseEntity<BookingDto> addGuests(@PathVariable Long bookingId,
+                                                @RequestBody List<GuestsDto> guestsDtoList){
+        return ResponseEntity.ok(bookingService.addGuests(bookingId, guestsDtoList));
+    }
 }

@@ -3,6 +3,7 @@ package com.vanktesh.project.airBnbApp.controller;
 import com.vanktesh.project.airBnbApp.dto.BookingDto;
 import com.vanktesh.project.airBnbApp.dto.HotelDto;
 import com.vanktesh.project.airBnbApp.dto.HotelReportDto;
+import com.vanktesh.project.airBnbApp.dto.RoomDto;
 import com.vanktesh.project.airBnbApp.entity.Booking;
 import com.vanktesh.project.airBnbApp.service.BookingService;
 import com.vanktesh.project.airBnbApp.service.HotelService;

@@ -26,4 +26,6 @@ public interface BookingService {
     List<BookingDto> getAllBookingsByHotelId(Long hotelId) throws AccessDeniedException;
 
     HotelReportDto geHotelReport(Long hotelId, LocalDate startDate, LocalDate endDate) throws AccessDeniedException;
+
+    List<BookingDto> getMyBookings();
 }

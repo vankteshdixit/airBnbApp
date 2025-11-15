@@ -1,10 +1,12 @@
 package com.vanktesh.project.airBnbApp.service;
 
 import com.vanktesh.project.airBnbApp.dto.ProfileUpdateRequestDto;
+import com.vanktesh.project.airBnbApp.dto.UserDto;
 import com.vanktesh.project.airBnbApp.entity.User;
 import com.vanktesh.project.airBnbApp.exception.ResourceNotFoundException;
 import com.vanktesh.project.airBnbApp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import static com.vanktesh.project.airBnbApp.util.AppUtils.getCurrentUser;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService, UserDetailsService {
@@ -35,6 +38,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if(profileUpdateRequestDto.getName() !=null) user.setName(profileUpdateRequestDto.getName());
 
         userRepository.save(user);
+    }
+
+    @Override
+    public UserDto getMyProfile() {
+        User user = getCurrentUser();
+        log.info("Getting the Profile for user with id: {}", user.getId());
+        return modelMapper.map(user, UserDto.class);
+
     }
 
     @Override

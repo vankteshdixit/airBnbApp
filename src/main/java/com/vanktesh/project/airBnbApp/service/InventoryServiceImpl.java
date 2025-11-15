@@ -17,9 +17,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.math.BigDecimal;
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -84,13 +84,13 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public List<InventoryDto> getAllInventoryByRoom(Long roomId) throws AccessDeniedException {
+    public List<InventoryDto> getAllInventoryByRoom(Long roomId) {
         log.info("Getting all inventory by roomId for room with id :{}", roomId);
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with id :"+ roomId));
 
         User user = getCurrentUser();
-        if(!user.getId().equals(room.getHotel().getOwner().getId())) throw new AccessDeniedException("You are not the owner room with id: "+ roomId);
+        if(!user.equals(room.getHotel().getOwner())) throw new AccessDeniedException("You are not the owner room with id: "+ roomId);
         return inventoryRepository
                 .findByRoomOrderByDate(room)
                 .stream()
@@ -101,7 +101,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional
-    public void updateInventory(Long roomId, UpdateInventoryRequestDto updateInventoryRequestDto) throws AccessDeniedException {
+    public void updateInventory(Long roomId, UpdateInventoryRequestDto updateInventoryRequestDto) {
         log.info("Updating all inventory by roomId for room with id :{} between date Range: {} - {}", roomId,
                 updateInventoryRequestDto.getStartDate(),
                 updateInventoryRequestDto.getEndDate());
@@ -109,7 +109,7 @@ public class InventoryServiceImpl implements InventoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with id :"+ roomId));
 
         User user = getCurrentUser();
-        if(!user.getId().equals(room.getHotel().getOwner().getId())) throw new AccessDeniedException("You are not the owner room with id: "+ roomId);
+        if(!user.equals(room.getHotel().getOwner())) throw new AccessDeniedException("You are not the owner room with id: "+ roomId);
 
         inventoryRepository.getInventoryAndLockBeforeUpdate(roomId,
                 updateInventoryRequestDto.getStartDate(),

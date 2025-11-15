@@ -19,13 +19,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -116,7 +115,7 @@ public class BookingServiceImpl implements BookingService{
 
         User user = getCurrentUser();
 
-        if(!user.getId().equals(booking.getUser().getId())){
+        if(!user.equals(booking.getUser())){
             throw new UnAuthorisedException("Booking does not belong to this user with id "+ user.getId());
         }
 
@@ -147,7 +146,7 @@ public class BookingServiceImpl implements BookingService{
                 () -> new ResourceNotFoundException("Booking not found with id: "+bookingId)
         );
         User user = getCurrentUser();
-        if(!user.getId().equals(booking.getUser().getId())){
+        if(!user.equals(booking.getUser())){
             throw new UnAuthorisedException("Booking does not belong to this user with id "+ user.getId());
         }
         if(hasBookingExpired(booking)){
@@ -199,7 +198,7 @@ public class BookingServiceImpl implements BookingService{
                 () -> new ResourceNotFoundException("Booking not found with id: "+bookingId)
         );
         User user = getCurrentUser();
-        if(!user.getId().equals(booking.getUser().getId())){
+        if(!user.equals(booking.getUser())){
             throw new UnAuthorisedException("Booking does not belong to this user with id "+ user.getId());
         }
         if(booking.getBookingStatus() != BookingStatus.CONFIRMED){
@@ -245,13 +244,13 @@ public class BookingServiceImpl implements BookingService{
     }
 
     @Override
-    public List<BookingDto> getAllBookingsByHotelId(Long hotelId) throws AccessDeniedException {
+    public List<BookingDto> getAllBookingsByHotelId(Long hotelId) {
         Hotel hotel = hotelRepository
                 .findById(hotelId)
-                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with Id:"+ hotelId));
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with Id: "+ hotelId));
         User user = getCurrentUser();
         log.info("Getting all Bookings for the Hotels with ID: {}", hotelId);
-        if(!user.getId().equals(hotel.getOwner().getId())) throw new AccessDeniedException("You are not the owner of the hotel with ID" + hotelId);
+        if(!user.equals(hotel.getOwner())) throw new AccessDeniedException("You are not the owner of the hotel with ID" + hotelId);
 
         List<Booking> bookings =  bookingRepository.findByHotel(hotel);
 
@@ -261,13 +260,13 @@ public class BookingServiceImpl implements BookingService{
     }
 
     @Override
-    public HotelReportDto geHotelReport(Long hotelId, LocalDate startDate, LocalDate endDate) throws AccessDeniedException {
+    public HotelReportDto geHotelReport(Long hotelId, LocalDate startDate, LocalDate endDate){
         Hotel hotel = hotelRepository
                 .findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with Id:"+ hotelId));
         User user = getCurrentUser();
         log.info("Generating Report for Hotels with ID: {}", hotelId);
-        if(!user.getId().equals(hotel.getOwner().getId())) throw new AccessDeniedException("You are not the owner of the hotel with ID" + hotelId);
+        if(!user.equals(hotel.getOwner())) throw new AccessDeniedException("You are not the owner of the hotel with ID" + hotelId);
 
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
